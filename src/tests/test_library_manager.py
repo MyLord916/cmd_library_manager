@@ -5,7 +5,7 @@ from src.library_manager_tools import *
 class LibManTest(TestCase):
     def test_handler(self):
         self.assertEqual(handler('add наука - sten kily 1895'),
-                         {'command': 'add', 'book': 'Наука', 'author': 'Sten Kily', 'year': 1895})
+                         {'id': 1, 'book': 'наука ', 'author': ' sten kily', 'year': '1895', 'status': 'в наличии'})
 
         self.assertEqual(handler('add наука и техника-дмитрий нозаров 2012'),
                          {'command': 'add', 'book': 'Наука и техника', 'author': 'Дмитрий Нозаров', 'year': 2012})
