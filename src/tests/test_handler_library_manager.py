@@ -1,8 +1,8 @@
 from unittest import TestCase, main
-from src.library_manager_tools import *
+from src.handler_library_manager import handler
 
 
-class LibManTest(TestCase):
+class HandLibManTest(TestCase):
     def test_handler(self):
         self.assertEqual(handler('add наука - sten kily 1895'),
                          {'id': 1, 'book': 'наука ', 'author': ' sten kily', 'year': '1895', 'status': 'в наличии'})

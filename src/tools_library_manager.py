@@ -2,26 +2,6 @@ import json
 
 default_path = 'books.json'
 
-def handler(mes):
-    commands = {
-        'add': add_book,
-        'del': del_book,
-        'stat': change_status
-    }
-    # if not any(cmd in commands.split(', ') for cmd in unit):
-    #     return f'Сообщение должно начинаться с команды: {commands}'
-    unit = tuple(mes.split())
-    command, *book_author, year = unit
-    book_author = ' '.join(book_author)
-    book, author = book_author.split('-')
-    data = {
-        'book': book.capitalize().strip(),
-        'author': author.title().strip(),
-        'year': year,
-        'status': 'в наличии'
-    }
-    return commands['add'](data)
-
 
 def get_id() -> str:
     ''''''
@@ -46,7 +26,12 @@ def update_json(data):
 def add_book(text: str) -> None:
     ''''''
     elem = tuple(text.split('/'))
-    book, author, year = elem
+    try:
+        book, author, year = elem
+    except ValueError:
+        raise ValueError('Для занесения книги в список нужно сделать запись в формате title/author/year')
+    if not year.isdigit():
+        raise ValueError('Год должен быть числом')
     data_book = {
         'book': book.capitalize().strip(),
         'author': author.title().strip(),
@@ -70,8 +55,14 @@ def add_book(text: str) -> None:
 def del_book(book_id: str) -> None:
     ''''''
     data = collect_data()
-    del data[book_id]
-    update_json(data)
+    if book_id.isdigit():
+        if book_id in data:
+            del data[book_id]
+            update_json(data)
+        else:
+            raise ValueError('Данный номер отсутствует в списке')
+    else:
+        raise ValueError('Необходимо указать номер книги для ее удаления')
 
 
 def search_book(point: str) -> dict:
@@ -96,15 +87,25 @@ def show_books(data: dict = None) -> None:
         print(id, *item, sep=' | ')
 
 
-def change_status(book_id: str, status: str = '0') -> None:
+def change_status(text) -> None:
     ''''''
-    data = collect_data()
-    if status == '0':
-        data[book_id]['status'] = 'выдана'
-    elif status == '1':
-        data[book_id]['status'] = 'в наличии'
+    try:
+        book_id, status = text.split()
+    except ValueError:
+        raise ValueError('Необходимо указать номер книги и статус: 1 - В наличии, 0 - выдана')
+    if book_id.isdigit():
+        data = collect_data()
+        if book_id in data:
+            if status == '0':
+                data[book_id]['status'] = 'выдана'
+            elif status == '1':
+                data[book_id]['status'] = 'в наличии'
+            else:
+                raise TypeError('Статус может быть только: 1 - в наличии, 0 - выдана')
+        else:
+            raise ValueError('Книги с таким номером не существует')
     else:
-        raise TypeError('Статус может быть только: 1-(в наличии), 0-(выдана)')
+        raise TypeError('Для смены статуса нужно указать номер книги')
     update_json(data)
 
 

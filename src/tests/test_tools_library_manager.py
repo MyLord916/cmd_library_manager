@@ -1,9 +1,9 @@
 from unittest import TestCase, main
 from os import remove
-from src.library_manager_tools import *
+from src.tools_library_manager import *
 
 
-class LibManToolTest(TestCase):
+class ToolLibManTest(TestCase):
     def test_add(self):
         s = [
             'Солнце живых/Шмелев И./1931',
@@ -15,18 +15,30 @@ class LibManToolTest(TestCase):
         for i in s:
             add_book(i)
         self.assertEqual(len(collect_data()), 5)
-        with self.assertRaises(TypeError) as e:
+        with self.assertRaises(TypeError):
             add_book('Плутония/Обручев В./1915')
+        with self.assertRaises(ValueError):
+            add_book('')
+            add_book('Плутония/Обручев В./тыщадевятсотпятнадцатый')
 
     def test_change_status(self):
-        change_status('1')
+        change_status('1 0')
         self.assertEqual(collect_data()['1']['status'], 'выдана')
-        change_status('1', '1')
+        change_status('1 1')
         self.assertEqual(collect_data()['1']['status'], 'в наличии')
+        with self.assertRaises(TypeError):
+            change_status('two 1')
+            change_status('2 one')
+        with self.assertRaises(ValueError):
+            change_status('')
+            change_status('100 1')
 
     def test_dell(self):
         del_book('1')
         self.assertEqual(len(collect_data()), 4)
+        with self.assertRaises(ValueError):
+            del_book('')
+            del_book('100')
 
     def test_id(self):
         add_book('Чапаев/Фурманов Д./1923')
