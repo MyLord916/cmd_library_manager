@@ -1,1 +1,1 @@
-default_path = 'books.json'
+path = 'data/books.json'

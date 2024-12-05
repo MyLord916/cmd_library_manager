@@ -1,69 +1,55 @@
 import json
 
-from src.config import default_path
-from src.storage import collect_data, update_json
-from src.schemas import format_book, Book
+from src import config, storage, schemas, config
 
 
 def add_book(book: object) -> None:
     ''''''
-    data_book = format_book(book)
+    data_book = schemas.format_book(book)
     try:
-        file = open(default_path)
+        file = open(config.path)
     except IOError as e:
-        with open(default_path, "w", encoding="utf-8") as file:
+        with open(config.path, "w", encoding="utf-8") as file:
             json.dump({1: data_book}, file, indent=4, ensure_ascii=False)
     else:
-        data = collect_data()
+        data = storage.collect_data()
         if data_book not in data.values():
             if len(data):
                 book_id = str(int(max(data)) + 1)
             else:
                 book_id = 1
             data.update({book_id: data_book})
-            update_json(data)
+            storage.update_json(data)
         else:
-            raise TypeError('Элемент уже присутствует в списке')
+            print('Элемент уже присутствует в списке')
 
 
 def del_book(book_id: str) -> None:
     ''''''
-    data = collect_data()
-    if book_id.isdigit():
-        if book_id in data:
-            del data[book_id]
-            update_json(data)
-        else:
-            raise ValueError('Данный номер отсутствует в списке')
+    data = storage.collect_data()
+    if book_id in data:
+        del data[book_id]
+        storage.update_json(data)
     else:
-        raise ValueError('Необходимо указать номер книги для ее удаления')
+        print('Данный номер отсутствует в списке')
 
 
-def change_status(text) -> None:
+def change_status(book_id, status) -> None:
     ''''''
-    try:
-        book_id, status = text.split()
-    except ValueError:
-        raise ValueError('Необходимо указать номер книги и статус: 1 - В наличии, 0 - выдана')
-    if book_id.isdigit():
-        data = collect_data()
-        if book_id in data:
-            if status == '0':
-                data[book_id]['status'] = 'выдана'
-            elif status == '1':
-                data[book_id]['status'] = 'в наличии'
-            else:
-                raise TypeError('Статус может быть только: 1 - в наличии, 0 - выдана')
-        else:
-            raise ValueError('Книги с таким номером не существует')
+    data = storage.collect_data()
+    if book_id in data:
+        if status == '0':
+            data[book_id]['status'] = 'выдана'
+        elif status == '1':
+            data[book_id]['status'] = 'в наличии'
     else:
-        raise TypeError('Для смены статуса нужно указать номер книги')
-    update_json(data)
+        print('Книги с таким номером не существует')
+    storage.update_json(data)
 
 
-def search_book(items: list[str]) -> dict:
+def search_book(*items: list[str]) -> dict:
     ''''''
-    data = collect_data()
+    data = storage.collect_data()
     result = {key: value for key, value in data.items() if
               any(point.lower() in (el.lower() for el in value.values()) for point in items)}
     return result
@@ -72,7 +58,7 @@ def search_book(items: list[str]) -> dict:
 def show_books(data: dict = None) -> None:
     ''''''
     if data is None:
-        data = collect_data()
+        data = storage.collect_data()
     if len(data):
         book_indent = max([len(el['title']) for el in data.values()])
         author_indent = max([len(el['author']) for el in data.values()])
@@ -87,7 +73,3 @@ def show_books(data: dict = None) -> None:
             print(id, *item, sep=' | ')
     else:
         print('Нет совпадений')
-
-
-if __name__ == '__main__':
-    show_books(search_book(['1922']))
