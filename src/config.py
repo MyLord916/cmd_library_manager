@@ -1,1 +1,1 @@
-path = 'data/books.json'
+path = 'books.json'     # Путь к файлу для сохранения списка книг

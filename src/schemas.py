@@ -6,7 +6,7 @@ class Book:
 
 
 def format_book(book: object) -> dict:
-    ''''''
+    """Компоновка элементов книги для добавления в словарь"""
     data_book = {
         'title': book.title.capitalize().strip(),
         'author': book.author.title().strip(),
