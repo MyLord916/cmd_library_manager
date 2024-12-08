@@ -16,6 +16,7 @@ class TestHandlerGood(TestCase):
         # Проверка вызова функции add_book
         mock_add.assert_called_once()
 
+
     @patch('src.managers.del_book')
     def test_del_book(self, mock_del):
 
