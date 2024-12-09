@@ -1,5 +1,4 @@
 import json
-import os
 
 from src import storage, schemas, config
 
